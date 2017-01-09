@@ -28,15 +28,15 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+
     // 注册API
     public function register(){
-        /* 1. 定义接收用户名 */
-        $username = Request::get('user_name');
-        $password = Request::get('user_password');
-
-        /* 2. 检查用户名和密码是否为空 */
-        if (!($username && $password))
+       // 调用封装方法
+        $has_username_password = $this->has_username_and_password();
+        if (!$has_username_password)
             return ['status' => 0, 'msg' => '用户名和密码不可为空'];
+        $username = $has_username_password[0];
+        $password = $has_username_password[1];
 
         /* 3.检查用户名是否存在 */
         $user_exists = $this->where('user_name',$username)->exists();
@@ -59,4 +59,57 @@ class User extends Authenticatable
     }
 
     // 登录API
+    public function login(){
+        // 调用封装方法
+
+        /* 1.检查用户名和密码是否存在 */
+        $has_username_password = $this->has_username_and_password();
+        if (!$has_username_password)
+            return ['status' => 0, 'msg' => '用户名和密码不可为空'];
+        $username = $has_username_password[0];
+        $password = $has_username_password[1];
+
+        /* 2.检查用户名在数据库是否存在 */
+        $user = $this->where('user_name',$username)->first();
+        if(!$user)
+            return ['status' => 0, 'msg' => '用户不存在'];
+
+        /* 3.检查密码是否正确 */
+        $hashed_password = $user->user_password;
+        if(!\Hash::check($password,$hashed_password))
+            return ['status' => 0, 'msg' => '密码有误'];
+
+        /* 4.将用户信息写了session */
+        session()->put('username',$user->user_name);
+        session()->put('user_id',$user->user_id);
+
+        return ['status' => 1, 'id' => $user->user_id,'msg' => '登录成功!'];
+    }
+
+    /* 检查用户是否登录 */
+    public function is_logged_in(){
+        /* 判断SESSION中用户ID是否存在，user_id返回用户ID，否则返回false */
+        return session('user_id') ? : false;
+    }
+
+    // 登出API
+    public function logout(){
+        /* 删除username */
+        session()->forget('username');
+        /* 删除user_id */
+        session()->forget('user_id');
+        return ['status' => 1,'msg' => '退出成功!'];
+    }
+
+    //封装方法
+    public function has_username_and_password(){
+        /* 1. 定义接收用户名 */
+        $username = Request::get('user_name');
+        $password = Request::get('user_password');
+
+        /* 2. 检查用户名和密码是否为空 */
+        if($username && $password)
+            return [$username,$password];
+        return false;
+    }
 }
