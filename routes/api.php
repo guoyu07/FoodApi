@@ -44,4 +44,4 @@ Route::get('/user-list', function () {
     if($user->toArray())
         return response([ 'status' => '1', 'data' => $user->toArray() ]);
     return response([ 'status' => '0', 'msg' => '暂无数据' ]);
-})->middleware('api');
+})->middleware('api.admin.login','api');

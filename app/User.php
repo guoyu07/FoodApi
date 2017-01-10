@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Request;
+use Cache;
 
 class User extends Authenticatable
 {
@@ -82,11 +83,14 @@ class User extends Authenticatable
         if(!\Hash::check($password,$hashed_password))
             return ['status' => 0, 'msg' => '密码有误'];
 
-        /* 4.将用户信息写了session */
+        /* 4.将用户信息写了session 或者写入缓存 */
         session()->put('username',$user->user_name);
         session()->put('user_id',$user->user_id);
 
-        return ['status' => 1, 'id' => $user->user_id,'msg' => '登录成功!'];
+        $accessToken = [ 'accessToken' => str_random(60),'username' => $user->user_name,'user_id' => $user->user_id ];
+        Cache::add('access_token',$accessToken,60);
+
+        return ['status' => 1, 'id' => $user->user_id, 'accessToken' => Cache::get('access_token')['accessToken'] ,'msg' => '登录成功!'];
     }
 
     /* 检查用户是否登录 */
@@ -101,6 +105,10 @@ class User extends Authenticatable
         session()->forget('username');
         /* 删除user_id */
         session()->forget('user_id');
+
+        /* 删除缓存 */
+        Cache::pull('access_token');
+
         return ['status' => 1,'msg' => '退出成功!'];
     }
 
