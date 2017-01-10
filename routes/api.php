@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,4 +36,12 @@ Route::post('/login', function () {
 /* 登出API */
 Route::post('/logout', function () {
     return user_ins()->logout();
+})->middleware('api');
+
+/* 用户查询API */
+Route::get('/user-list', function () {
+    $user = User::whereUserRole(User::ROLE_USER)->get();
+    if($user->toArray())
+        return response([ 'status' => '1', 'data' => $user->toArray() ]);
+    return response([ 'status' => '0', 'msg' => '暂无数据' ]);
 })->middleware('api');

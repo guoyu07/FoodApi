@@ -20,8 +20,8 @@ class CreateUsersTable extends Migration
             $table->string('user_zsname')->nullable();
             $table->string('user_sex')->nullable();
             $table->string('user_mobile')->nullable();
-            $table->integer('user_role')->default(0);
-            $table->integer('user_status')->default(0);
+            $table->integer('user_role')->default(10);
+            $table->integer('user_status')->default(10);
             $table->string('user_headimgurl')->nullable();
             $table->string('user_name')->unique();
             $table->string('user_password')->nullable();
