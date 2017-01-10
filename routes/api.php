@@ -62,6 +62,16 @@ Route::get('/user-list', function () {
 })->middleware('api.admin.login','api','cors');
 
 /* 类别添加API */
-Route::post('/sort-list', function () {
+Route::post('/sort-insert', function () {
    return (new \App\Sort())->sortInsert();
+})->middleware('api.admin.login','api','cors');
+
+/* 类别列表API */
+Route::get('/sort-list', function () {
+    return (new \App\Sort())->sortList();
+})->middleware('api.admin.login','api','cors');
+
+/* 类别更新API */
+Route::get('/sort-update', function () {
+    return (new \App\Sort())->sortUpdate();
 })->middleware('api.admin.login','api','cors');
