@@ -17,6 +17,21 @@ use App\User;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:api');
+/*
+ |--------------------------------------------------------------------------
+ | 无需登录接口
+ |--------------------------------------------------------------------------
+ */
+
+
+
+
+
+/*
+ |--------------------------------------------------------------------------
+ | 需登录后的接口
+ |--------------------------------------------------------------------------
+ */
 
 // 封装方法
  function user_ins(){
@@ -44,4 +59,9 @@ Route::get('/user-list', function () {
     if($user->toArray())
         return response([ 'status' => '1', 'data' => $user->toArray() ]);
     return response([ 'status' => '0', 'msg' => '暂无数据' ]);
+})->middleware('api.admin.login','api','cors');
+
+/* 类别添加API */
+Route::post('/sort-list', function () {
+   return (new \App\Sort())->sortInsert();
 })->middleware('api.admin.login','api','cors');
