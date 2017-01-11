@@ -80,4 +80,14 @@ class Sort extends Model
         return response(['status' => '0','msg' => '更新失败']);
     }
 
+    /* 类别删除API */
+    public function sortDelete($sort_id){
+        $sort = Sort::find($sort_id);
+        if(!$sort!=null)
+            return response(['status' => '0','msg' => '类别ID不存在']);
+        if ($sort->delete())
+            return response(['status' => '1','msg' => '删除成功']);
+        return response(['status' => '0','msg' => '删除失败']);
+    }
+
 }

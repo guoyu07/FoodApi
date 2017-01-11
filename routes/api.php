@@ -2,7 +2,6 @@
 
 use Illuminate\Http\Request;
 use App\User;
-use App\Sort;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,7 +33,7 @@ Route::get('/user', function (Request $request) {
  |--------------------------------------------------------------------------
  */
 
-// 封装方法
+// 封装用户对象实例化
  function user_ins(){
     return new \App\User;
  }
@@ -62,17 +61,28 @@ Route::get('/user-list', function () {
     return response([ 'status' => '0', 'msg' => '暂无数据' ]);
 })->middleware('api.admin.login','api','cors');
 
+
+// 封装类别对象实例化
+function sort_ins(){
+    return new \App\Sort();
+}
+
 /* 类别添加API */
 Route::post('/sort-insert', function () {
-   return (new \App\Sort())->sortInsert();
+   return sort_ins()->sortInsert();
 })->middleware('api.admin.login','api','cors');
 
 /* 类别列表API */
 Route::get('/sort-list', function () {
-    return (new \App\Sort())->sortList();
+    return sort_ins()->sortList();
 })->middleware('api.admin.login','api','cors');
 
 /* 类别更新API */
 Route::post('/sort-update', function () {
-    return (new \App\Sort())->sortUpdate();
+    return sort_ins()->sortUpdate();
+})->middleware('api.admin.login','api','cors');
+
+/* 类别删除 API */
+Route::get('/sort-delete/{sort_id}', function ($sort_id) {
+    return sort_ins()->sortDelete($sort_id);
 })->middleware('api.admin.login','api','cors');
