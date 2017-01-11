@@ -86,3 +86,14 @@ Route::post('/sort-update', function () {
 Route::get('/sort-delete/{sort_id}', function ($sort_id) {
     return sort_ins()->sortDelete($sort_id);
 })->middleware('api.admin.login','api','cors');
+
+
+// 封装菜单对象实例化
+function menu_ins(){
+    return new \App\Menu();
+}
+
+/* 菜单添加API */
+Route::post('/menu-insert', function () {
+    return menu_ins()->menuInsert();
+})->middleware('api.admin.login','api','cors');
