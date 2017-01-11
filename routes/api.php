@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use App\User;
+use App\Sort;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,6 +73,6 @@ Route::get('/sort-list', function () {
 })->middleware('api.admin.login','api','cors');
 
 /* 类别更新API */
-Route::get('/sort-update', function () {
+Route::post('/sort-update', function () {
     return (new \App\Sort())->sortUpdate();
 })->middleware('api.admin.login','api','cors');

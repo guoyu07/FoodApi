@@ -5,10 +5,11 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Validator;
 use Request;
-use App\Menu;
 
 class Sort extends Model
 {
+    public $primaryKey = 'sort_id';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -53,7 +54,7 @@ class Sort extends Model
         $menu_sorts= Sort::all();
         $sort[]='';
         foreach($menu_sorts as $list){
-            $sort[]=[
+            $sort[$list['sort_name']]=[
                 'sort_id'=>$list['sort_id'],
                 'sort_name'=>$list['sort_name'],
                 'sort_order'=>$list['sort_order'],
@@ -65,7 +66,18 @@ class Sort extends Model
 
     /* 类别更新API */
     public function sortUpdate(){
+        $rules = [ 'sort_name' => 'required|max:45','sort_id' => 'required|exists:sorts'];
+        $messages = [ 'sort_name.required' => trans('类别名称必填') ,'sort_id.required' => trans('类别ID必填'),'sort_id.exists' => trans('类别ID不存在')];
+        $validator = Validator::make(Request::all(), $rules, $messages);
 
+        if ($validator->fails())
+            return $validator->errors();
+
+        $sort = Sort::find(Request::get('sort_id'));
+        $sort->sort_name = Request::get('sort_name');
+        if($sort->save())
+            return response(['status' => '1','msg' => '更新成功']);
+        return response(['status' => '0','msg' => '更新失败']);
     }
 
 }
