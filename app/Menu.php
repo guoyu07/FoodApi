@@ -72,7 +72,7 @@ class Menu extends Model
         foreach($menu_sorts as $list){
             $menu = Menu::whereMenuType($list['sort_id'])->get();
             foreach ($menu as $menu_list){
-                $sort[$list['sort_name']]=[
+                $sort[$list['sort_name']][]=[
                     'menu_id'=>$menu_list['menu_id'],
                     'menu_name'=>$menu_list['menu_name'],
                     'menu_description'=>$menu_list['menu_description'],
