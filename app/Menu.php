@@ -17,7 +17,7 @@ class Menu extends Model
      * @var array
      */
     protected $fillable = [
-        'menu_name'
+        'menu_name','menu_description','menu_price','menu_pictrue','menu_type'
     ];
 
     /**
@@ -47,16 +47,43 @@ class Menu extends Model
             Storage::disk('uploads')->put($filename,file_get_contents($realPath));
             $pic_url = 'http://'.Request::getHttpHost().'/images/'.$filename;
 
-        $menu = $this;
-        $menu->menu_name = Request::get('menu_name');
-        $menu->menu_description = Request::get('menu_description');
-        $menu->menu_price = Request::get('menu_price');
-        $menu->menu_pictrue = $pic_url;
-        $menu->menu_type = Request::get('menu_type');
+        $menu = Menu::create([
+            'menu_name' => Request::get('menu_name'),
+            'menu_description' => Request::get('menu_description'),
+            'menu_price' =>Request::get('menu_price'),
+            'menu_pictrue' => $pic_url,
+            'menu_type' => Request::get('menu_type')
+        ]);
 
-        if($menu->save())
+        if($menu)
             return response(['status' => '1','msg' => '添加成功']);
         return response(['status' => '0','msg' => '添加失败']);
 
     }
+
+    /* 菜单列表API */
+    public function menuList(){
+        return $this->menuSorts();
+    }
+
+    protected function menuSorts(){
+        $menu_sorts= Sort::all();
+        $sort[]='';
+        foreach($menu_sorts as $list){
+            $menu = Menu::whereMenuType($list['sort_id'])->get();
+            foreach ($menu as $menu_list){
+                $sort[$list['sort_name']]=[
+                    'menu_id'=>$menu_list['menu_id'],
+                    'menu_name'=>$menu_list['menu_name'],
+                    'menu_description'=>$menu_list['menu_description'],
+                    'menu_price'=>$menu_list['menu_price'],
+                    'menu_order'=>$menu_list['menu_order'],
+                    'menu_pictrue'=>$menu_list['menu_pictrue'],
+                    'menu_type'=>$list['sort_name']
+                ];
+            }
+        }
+        return array_filter($sort);
+    }
+
 }

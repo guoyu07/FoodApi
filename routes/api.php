@@ -97,3 +97,8 @@ function menu_ins(){
 Route::post('/menu-insert', function () {
     return menu_ins()->menuInsert();
 })->middleware('api.admin.login','api','cors');
+
+/* 菜单列表API */
+Route::get('/menu-list', function () {
+    return menu_ins()->menuList();
+})->middleware('api.admin.login','api','cors');
