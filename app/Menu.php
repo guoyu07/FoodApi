@@ -134,4 +134,18 @@ class Menu extends Model
 
     }
 
+    /* 菜单删除API */
+    public function menuDelete($menu_id){
+        $menu = Menu::find($menu_id);
+        if(!empty($menu['menu_pictrue'])){
+            $images = public_path('images/') . $menu['menu_pictrue'];
+            if (file_exists ($images )) {
+                unlink ($images);
+            }
+        }
+        if($menu->delete())
+            return response(['status' => '1','msg' => '删除成功']);
+        return response(['status' => '0','msg' => '删除失败']);
+    }
+
 }

@@ -107,3 +107,8 @@ Route::get('/menu-list', function () {
 Route::post('/menu-update', function () {
     return menu_ins()->menuUpdate();
 })->middleware('api.admin.login','api','cors');
+
+/* 菜单删除API */
+Route::get('/menu-delete/{menu_id}', function ($menu_id) {
+    return menu_ins()->menuDelete($menu_id);
+})->middleware('api.admin.login','api','cors');
