@@ -102,3 +102,8 @@ Route::post('/menu-insert', function () {
 Route::get('/menu-list', function () {
     return menu_ins()->menuList();
 })->middleware('api.admin.login','api','cors');
+
+/* 菜单更新API */
+Route::post('/menu-update', function () {
+    return menu_ins()->menuUpdate();
+})->middleware('api.admin.login','api','cors');

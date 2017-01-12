@@ -45,13 +45,12 @@ class Menu extends Model
             $realPath = $file->getRealPath();
             $filename = date('Y-m-d-H-i-s').'-'.uniqid().'.'.$ext;
             Storage::disk('uploads')->put($filename,file_get_contents($realPath));
-            $pic_url = 'http://'.Request::getHttpHost().'/images/'.$filename;
 
         $menu = Menu::create([
             'menu_name' => Request::get('menu_name'),
             'menu_description' => Request::get('menu_description'),
             'menu_price' =>Request::get('menu_price'),
-            'menu_pictrue' => $pic_url,
+            'menu_pictrue' => $filename,
             'menu_type' => Request::get('menu_type')
         ]);
 
@@ -78,12 +77,61 @@ class Menu extends Model
                     'menu_description'=>$menu_list['menu_description'],
                     'menu_price'=>$menu_list['menu_price'],
                     'menu_order'=>$menu_list['menu_order'],
-                    'menu_pictrue'=>$menu_list['menu_pictrue'],
+                    'menu_pictrue'=>$menu_list['menu_pictrue'] ? 'http://'.Request::getHttpHost().'/images/'.$menu_list['menu_pictrue'] :'',
                     'menu_type'=>$list['sort_name']
                 ];
             }
         }
         return array_filter($sort);
+    }
+
+    /* 菜单更新API */
+    public function menuUpdate(){
+        $rules = ['menu_id' => 'required', 'menu_name' => 'required|max:45|unique:menus','menu_price' => 'required|max:45' ];
+        $messages = ['menu_id.required' => trans('菜单ID必填'), 'menu_name.required' => trans('菜单名称必填') ,'menu_name.unique' => trans('菜单名称已经存在'),'menu_price.required' => trans('价格必填') ];
+        $validator = Validator::make(Request::all(), $rules, $messages);
+
+        if ($validator->fails())
+            return $validator->errors();
+
+        $file = Request::file('menu_pictrue');
+        if($file)
+        {
+            // return '更新图片';
+            $ext = $file->getClientOriginalExtension();
+            $realPath = $file->getRealPath();
+            $filename = date('Y-m-d-H-i-s') . '-' . uniqid() . '.' . $ext;
+            Storage::disk('uploads')->put($filename, file_get_contents($realPath));
+
+            $menu = Menu::find(Request::get('menu_id'));
+            if (!empty($menu['menu_pictrue'])) {
+                $images = public_path('images/') . $menu['menu_pictrue'];
+                if (file_exists($images)) {
+                    unlink($images);
+                }
+            }
+
+            $menu->menu_name = Request::get('menu_name');
+            $menu->menu_description = Request::get('menu_description');
+            $menu->menu_price = Request::get('menu_price');
+            $menu->menu_pictrue = $filename;
+            $menu->menu_order = Request::get('menu_order');
+            $menu->menu_type = Request::get('menu_type');
+        }else{
+
+            //return '不更新图片';
+            $menu = Menu::find(Request::get('menu_id'));
+            $menu->menu_name = Request::get('menu_name');
+            $menu->menu_description = Request::get('menu_description');
+            $menu->menu_price = Request::get('menu_price');
+            $menu->menu_order = Request::get('menu_order');
+            $menu->menu_type = Request::get('menu_type');
+        }
+
+        if($menu->save())
+            return response(['status' => '1','msg' => '更新成功']);
+        return response(['status' => '0','msg' => '更新失败']);
+
     }
 
 }
